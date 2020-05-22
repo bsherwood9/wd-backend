@@ -24,8 +24,7 @@ function findWordsDefsExamples(user_id) {
       db.raw("JSON_AGG(distinct w.word) as word"),
       db.raw("JSON_AGG(distinct e.text) as Examples"),
       db.raw("ARRAY_AGG(distinct d.text) as Definitions")
-    )
-    .where({ user_id });
+    );
 }
 
 module.exports = {
