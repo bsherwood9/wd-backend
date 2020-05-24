@@ -8,9 +8,9 @@ const favRouter = require("../routes/fav-router");
 
 const server = express();
 
+server.use(cors());
 server.use(helmet());
 server.use(express.json());
-server.use(cors());
 
 server.use("/api/auth", authRouter);
 server.use("/api/users", userRouter);

@@ -16,15 +16,16 @@ function addExamples(examp, word_id) {
 
 function findWordsDefsExamples(user_id) {
   return db("users_words as uw")
-    .join("users as u", "u.id", "uw.word_id")
-    .join("words as w", "w.id", "uw.user_id")
+    .join("users as u", "u.id", "uw.user_id")
+    .join("words as w", "w.id", "uw.word_id")
     .join("definitions as d", "d.word_id", "w.id")
     .join("examples as e", "e.word_id", "w.id")
     .select(
-      db.raw("JSON_AGG(distinct w.word) as word"),
-      db.raw("JSON_AGG(distinct e.text) as Examples"),
+      db.raw("ARRAY_AGG(distinct w.word) as word"),
+      db.raw("ARRAY_AGG(distinct e.text) as Examples"),
       db.raw("ARRAY_AGG(distinct d.text) as Definitions")
-    );
+    )
+    .where({ user_id });
 }
 
 module.exports = {
