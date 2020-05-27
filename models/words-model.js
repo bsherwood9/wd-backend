@@ -15,18 +15,44 @@ function addExamples(examp, word_id) {
 }
 
 function findWordsDefsExamples(user_id) {
-  return db("users_words as uw")
-    .join("users as u", "u.id", "uw.user_id")
-    .join("words as w", "w.id", "uw.word_id")
-    .join("definitions as d", "d.word_id", "w.id")
-    .join("examples as e", "e.word_id", "w.id")
-    .select(
-      db.raw("ARRAY_AGG(distinct w.word) as word"),
-      db.raw("ARRAY_AGG(distinct e.text) as Examples"),
-      db.raw("ARRAY_AGG(distinct d.text) as Definitions")
-    )
-    .where({ user_id });
+  const length = () => {
+    return db("users_words as uw")
+      .join("users as u", "u.id", "uw.user_id")
+      .join("words as w", "w.id", "uw.word_id")
+      .select(db.raw("ARRAY_LENGTH(array_agg(distinct w.word),1)"))
+      .where({ user_id: user_id });
+  };
+  let realLength = length();
+  if (realLength) {
+    console.log("this is the length", realLength[0].array_length);
+    return db("users_words as uw")
+      .join("users as u", "u.id", "uw.user_id")
+      .join("words as w", "w.id", "uw.word_id")
+      .join("definitions as d", "d.word_id", "w.id")
+      .join("examples as e", "e.word_id", "w.id")
+      .select(
+        db.raw("ARRAY_LENGTH(array_agg(distinct w.word),1)"),
+        db.raw("array_agg(w.word)")
+        // db.raw("ARRAY_AGG(distinct e.text) as Examples"),
+        // db.raw("ARRAY_AGG(distinct d.text) as Definitions")
+      )
+      .where({ user_id: user_id });
+  }
 }
+// .union([
+//   db("users_words as uw")
+//     .join("users as u", "u.id", "uw.user_id")
+//     .join("words as w", "w.id", "uw.word_id")
+//     .join("definitions as d", "d.word_id", "w.id")
+//     .join("examples as e", "e.word_id", "w.id")
+//     .select(
+//       db.raw("ARRAY_AGG(distinct w.word) as word"),
+//       db.raw("ARRAY_AGG(distinct e.text) as Examples"),
+//       db.raw("ARRAY_AGG(distinct d.text) as Definitions")
+//     )
+//     .where({ user_id: user_id }),
+// ]);
+// }
 
 module.exports = {
   addWord,
