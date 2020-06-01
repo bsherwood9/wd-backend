@@ -15,6 +15,17 @@ router.get("/", restricted, (req, res) => {
     });
 });
 
+router.delete("/:id", restricted, (req, res) => {
+  const { id } = req.params;
+  Words.deleteWord(id)
+    .then((data) => {
+      res.json(data);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+});
+
 // router.post("/word", restricted, (req, res) => {
 //   const word = req.body;
 //   Words.addWord(word)
